@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 4.1)
 
+MESSAGE(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
+
 # Project metadata
 project(AnnoTool
     VERSION 1.0
@@ -27,6 +29,13 @@ add_executable(
     ${SRC_FILES}
     ${HDR_FILES}
 )
+
+# Find dependencies
+#find_package(Boost CONFIG REQUIRED program_options)
+find_package(boost_program_options CONFIG REQUIRED)
+
+# Link dependencies
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::program_options)
 
 # Organise files based on directories
 source_group(
