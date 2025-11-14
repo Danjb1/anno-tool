@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 
+#include "files/cod_file.h"
+#include "tool/tool.h"
+
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[])
@@ -27,6 +30,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    Anno::Config cfg;
+
     // Check Anno directory
     auto it = vm.find("anno-dir");
     if (it == vm.cend())
@@ -36,19 +41,36 @@ int main(int argc, char* argv[])
     }
     else
     {
-        std::string annoDir = it->second.as<std::string>();
-        // text.cod is present in both the original game and the History Edition
-        std::filesystem::path filePath = std::filesystem::path(annoDir) / "text.cod";
-        if (std::filesystem::exists(filePath))
+        std::string anno_dir = it->second.as<std::string>();
+        std::filesystem::path path = std::filesystem::path(anno_dir);
+        if (std::filesystem::exists(path / "1602.exe"))
         {
-            std::cout << "Found Anno directory: " << annoDir << "\n";
+            std::cout << "Found Anno 1602 directory: " << anno_dir << '\n';
+            cfg.anno_dir = anno_dir;
+            cfg.user_dir = anno_dir;
+        }
+        else if (std::filesystem::exists(path / "Anno1602.exe"))
+        {
+            std::cout << "Found Anno 1602 History Edition directory: " << anno_dir << '\n';
+            cfg.anno_dir = anno_dir;
+            cfg.user_dir = std::filesystem::path("%UserProfile%/Documents/Anno 1602 History Edition");
+            cfg.version = Anno::GameVersion::HistoryEdition;
         }
         else
         {
-            std::cout << "Invalid Anno directory: " << annoDir << "\n";
+            std::cout << "Invalid Anno directory: " << anno_dir << '\n';
             return 1;
         }
     }
+
+    // TMP
+    Anno::Tool tool(cfg);
+    std::cout << "Main game progress = " << tool.get_main_game_progress();
+
+    // TMP
+    Anno::CodFile cod_file(cfg.anno_dir / "text.cod");
+    cod_file.save_plain_text("C:/tmp/plain_text.cod");
+    cod_file.save_encoded("C:/tmp/encoded.cod");
 
     return 0;
 }

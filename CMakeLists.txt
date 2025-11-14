@@ -16,11 +16,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Declare source files
 set(SRC_FILES
+    src/files/cod_file.cpp
     src/main/main.cpp
+    src/tool/tool.cpp
 )
 
 # Declare header files
 set(HDR_FILES
+    include/files/cod_file.h
+    include/tool/tool.h
 )
 
 # Add the executable target
@@ -39,14 +43,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Boost::program_options)
 
 # Organise files based on directories
 source_group(
-    TREE "${CMAKE_CURRENT_SOURCE_DIR}"
-    PREFIX "Source Files"
-    FILES ${SRC_FILES}
+  TREE "${CMAKE_CURRENT_SOURCE_DIR}/src"
+  PREFIX "Source Files"
+  FILES ${SRC_FILES}
 )
 source_group(
-    TREE "${CMAKE_CURRENT_SOURCE_DIR}"
-    PREFIX "Header Files"
-    FILES ${HDR_FILES}
+  TREE "${CMAKE_CURRENT_SOURCE_DIR}/include"
+  PREFIX "Source Files"
+  FILES ${HDR_FILES}
 )
 
 # Add include directories
