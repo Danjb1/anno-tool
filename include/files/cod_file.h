@@ -3,6 +3,12 @@
 
 namespace Anno {
 
+/**
+ * Class used for reading and writing `.cod` files, which are used to store encoded text-based data.
+ *
+ * More info:
+ * https://github.com/Green-Sky/anno16_docs/blob/master/file_formats/script.md
+ */
 class CodFile
 {
 public:

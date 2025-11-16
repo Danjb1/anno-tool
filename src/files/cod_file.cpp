@@ -3,43 +3,12 @@
 #include <fstream>
 #include <stdexcept>
 
+#include "files/file_utils.h"
+
 namespace Anno {
 
-// TODO: Move to utils
-std::vector<char> read_entire_file(const std::filesystem::path& path)
-{
-    // Create a buffer to hold the file contents
-    auto size = std::filesystem::file_size(path);
-    std::vector<char> buffer(size);
-
-    // Read the file
-    std::ifstream file(path, std::ios::binary);
-    if (!file)
-    {
-        throw std::ios_base::failure("Failed to open file: " + path.string());
-    }
-    file.read(buffer.data(), size);
-
-    return buffer;
-}
-
-// TODO: Move to utils
-void save_file(const std::filesystem::path& path, const std::vector<char>& data)
-{
-    std::ofstream output(path, std::ios::binary);
-    if (!output)
-    {
-        throw std::ios_base::failure("Failed to open output file: " + path.string());
-    }
-
-    output.write(data.data(), data.size());
-    if (!output)
-    {
-        throw std::ios_base::failure("Failed writing file: " + path.string());
-    }
-}
-
 // Used to transform from encoded `.cod` format to readable ANSI (and vice versa)
+// See: https://github.com/Green-Sky/anno16_docs/blob/master/file_formats/encryption.md
 void transform_chars(std::vector<char>& buffer)
 {
     for (int i = 0; i < buffer.size(); ++i)
@@ -50,7 +19,7 @@ void transform_chars(std::vector<char>& buffer)
 
 std::vector<char> read_cod_file(const std::filesystem::path& path)
 {
-    std::vector<char> buffer = read_entire_file(path);
+    std::vector<char> buffer = FileUtils::read_binary_file(path);
     transform_chars(buffer);
     return buffer;
 }
@@ -62,14 +31,14 @@ CodFile::CodFile(const std::filesystem::path& path)
 
 void CodFile::save_plain_text(const std::filesystem::path& path)
 {
-    save_file(path, data);
+    FileUtils::write_binary_file(path, data);
 }
 
 void CodFile::save_encoded(const std::filesystem::path& path)
 {
     std::vector<char> cod_data = data;
     transform_chars(cod_data);
-    save_file(path, cod_data);
+    FileUtils::write_binary_file(path, cod_data);
 }
 
 }  // namespace Anno
