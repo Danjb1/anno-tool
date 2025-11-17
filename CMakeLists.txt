@@ -28,7 +28,6 @@ set(HDR_FILES
     include/files/cod_file.h
     include/files/file_utils.h
     include/files/game_dat_file.h
-    include/platform/windows/windows_config.h
     include/tool/config.h
     include/tool/tool.h
 )
@@ -68,7 +67,16 @@ target_include_directories(
 
 # Set compiler warnings
 if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /permissive-)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /permissive- /WX)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
+
+# Add Windows preprocessor definitions
+if (MSVC)
+    add_compile_definitions(
+        WIN32_LEAN_AND_MEAN
+        NOMINMAX
+        STRICT
+    )
 endif()

@@ -20,9 +20,10 @@ struct Campaign
     std::vector<CampaignLevel> levels;
 };
 
+// TODO: Replace with GameDatFile
 struct PlayerSaveData
 {
-    int main_game_progress;
+    int main_game_progress = 0;
     std::vector<int> campaign_progress;
 };
 

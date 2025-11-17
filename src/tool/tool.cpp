@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#pragma warning(push)
+#pragma warning(disable : 4100)  // Suppress unused parameter warnings for now
+
 namespace Anno {
 
 Tool::Tool(const Config& cfg)
@@ -53,3 +56,5 @@ void Tool::save_player_data()
 }
 
 }  // namespace Anno
+
+#pragma warning(pop)

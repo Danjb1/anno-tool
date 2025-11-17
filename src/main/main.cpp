@@ -18,15 +18,25 @@ int main(int argc, char* argv[])
 {
     // Define accepted program options
     po::options_description desc("Allowed options");
-    desc.add_options()                                                     //
-            ("help", "produce help message")                               //
-            ("anno-dir", po::value<std::string>(), "Anno 1602 directory")  //
+    /* clang-format off */
+    desc.add_options()
+            ("help", "produce help message")
+            ("anno-dir", po::value<std::string>(), "Anno 1602 directory")
             ;
+    /* clang-format on */
 
     // Parse command-line arguments
     po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
+    try
+    {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error parsing command line: " << e.what() << "\n\n" << desc << std::endl;
+        return 1;
+    }
 
     // Help text
     if (vm.count("help"))

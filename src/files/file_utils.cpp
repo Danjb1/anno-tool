@@ -4,11 +4,9 @@
 #include <stdexcept>
 
 #ifdef _WIN32
-#include <shlobj.h>
-#endif
+#include <windows.h>
 
-#ifdef _WIN32
-#include "platform/windows/windows_config.h"
+#include <shlobj.h>
 #endif
 
 namespace Anno { namespace FileUtils {

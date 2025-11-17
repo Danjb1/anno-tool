@@ -15,24 +15,29 @@ namespace Anno {
  */
 class GameDatFile
 {
+    struct SaveSlot
+    {
+        std::string name;
+        int num_players = 1;
+    };
+
 public:
-    GameDatFile(const std::filesystem::path& path, GameVersion gameVersion);
+    GameDatFile(const std::filesystem::path& path, GameVersion game_version);
 
     void save(const std::filesystem::path& path);
 
 private:
     void read_dat_file(const std::filesystem::path& path);
     bool parse_bool_setting(const std::string& line) const;
+    int parse_int_setting(const std::string& line, int default_value = 0) const;
     void parse_music_setting(const std::string& line);
     void parse_volume_setting(const std::string& line);
     void parse_disabled_music_track(const std::string& line);
     void parse_disabled_speech(const std::string& line);
     void parse_disabled_video(const std::string& line);
     void parse_autosave(const std::string& line);
-    void parse_continuous_play_selection(const std::string& line);
-    void parse_tutorial_selection(const std::string& line);
     void parse_campaign_progress(const std::string& line);
-    void parse_savegame_names(const std::vector<std::string>& lines, int& i);
+    void parse_save_slots(const std::vector<std::string>& lines, int& i);
 
 private:
     static constexpr int num_speech_categories = 8;
@@ -41,7 +46,7 @@ private:
 
     static constexpr int new_game_progress = -595;
 
-    GameVersion gameVersion;
+    GameVersion game_version;
 
     // General settings
     int music_bitmask = 0;  // purpose unknown
@@ -51,6 +56,7 @@ private:
     bool is_music_enabled = true;
     bool is_music_shuffle_enabled = true;
     bool is_sound_enabled = true;
+    bool video_quality_flag = true;  // purpose unknown
 
     // Disabled music tracks
     std::vector<int> disabled_music_tracks;
@@ -69,8 +75,8 @@ private:
     // Campaign progress
     std::map<int, int> campaign_progress;
 
-    // Save filenames
-    std::array<std::string, num_savegames> savegame_names;
+    // Save slots
+    std::array<SaveSlot, num_savegames> save_slots;
 };
 
 }  // namespace Anno
