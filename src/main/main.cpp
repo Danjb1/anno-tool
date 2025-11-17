@@ -82,14 +82,5 @@ int main(int argc, char* argv[])
     Tool tool(cfg);
     std::cout << "Main game progress = " << tool.get_main_game_progress();
 
-    // TMP
-    // CodFile cod_file(cfg.anno_dir / "text.cod");
-    // cod_file.save_plain_text("C:/tmp/plain_text.cod");
-    // cod_file.save_encoded("C:/tmp/encoded.cod");
-
-    // TMP
-    GameDatFile dat_file(cfg.user_dir / "Game.dat", cfg.version);
-    dat_file.save("C:/tmp/Game.dat");
-
     return 0;
 }

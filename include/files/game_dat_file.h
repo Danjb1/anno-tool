@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 #include <filesystem>
 #include <map>
@@ -24,7 +26,20 @@ class GameDatFile
 public:
     GameDatFile(const std::filesystem::path& path, GameVersion game_version);
 
-    void save(const std::filesystem::path& path);
+    void save_overwrite();
+
+    void save_to_path(const std::filesystem::path& path);
+
+    int get_main_game_progress() const
+    {
+        return main_game_progress;
+    }
+
+    void set_main_game_progress(int new_progress);
+
+    int get_campaign_progress(int campaign_index) const;
+
+    void set_campaign_progress(int campaign_index, int progress);
 
 private:
     void read_dat_file(const std::filesystem::path& path);
@@ -45,8 +60,10 @@ private:
     static constexpr int num_savegames = 12;
 
     static constexpr int new_game_progress = -595;
+    static constexpr int completed_game_progress = -580;
 
     GameVersion game_version;
+    std::filesystem::path src_path;
 
     // General settings
     int music_bitmask = 0;  // purpose unknown

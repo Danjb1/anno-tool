@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "files/cod_file.h"
+#include "files/game_dat_file.h"
 #include "tool/config.h"
 
 namespace Anno {
@@ -18,13 +20,6 @@ struct Campaign
 {
     std::string name;
     std::vector<CampaignLevel> levels;
-};
-
-// TODO: Replace with GameDatFile
-struct PlayerSaveData
-{
-    int main_game_progress = 0;
-    std::vector<int> campaign_progress;
 };
 
 class Tool
@@ -54,12 +49,13 @@ public:
      * Changes will not be saved to disk until `save_player_data` is called. */
     void set_campaign_progress(int campaign_index, int progress);
 
-    /** Saves the player save data to disk. */
+    /** Saves the player data (contained within Game.dat) to disk. */
     void save_player_data();
 
 private:
     Config cfg;
-    PlayerSaveData save_data;
+    GameDatFile game_dat_file;
+    CodFile text_cod;
     std::vector<Campaign> installed_campaigns;
 };
 

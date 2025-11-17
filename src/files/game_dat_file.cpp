@@ -5,6 +5,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/regex.hpp>
 
+#include <algorithm>  // clamp
 #include <format>
 #include <fstream>
 #include <iostream>
@@ -68,6 +69,7 @@ std::string bool_as_str(bool b)
 
 GameDatFile::GameDatFile(const std::filesystem::path& path, GameVersion game_version)
     : game_version(game_version)
+    , src_path(path)
 {
     read_dat_file(path);
 }
@@ -338,51 +340,56 @@ void GameDatFile::parse_save_slots(const std::vector<std::string>& lines, int& i
     }
 }
 
+void GameDatFile::save_overwrite()
+{
+    save_to_path(src_path);
+}
+
 /* clang-format off */
-void GameDatFile::save(const std::filesystem::path& path)
+void GameDatFile::save_to_path(const std::filesystem::path& path)
 {
     std::stringstream ss;
 
     // General settings
     ss << "\n"
-       << "  Musik:     " << std::format("{}, {}\n", bool_as_str(is_music_enabled), music_bitmask)
-       << "  Samples:   " << std::format("{}\n", bool_as_str(is_sound_enabled))
-       << "  Random:    " << std::format("{}\n", bool_as_str(is_music_shuffle_enabled))
-       << "  Volume:    " << std::format("{}, {}, {}\n", music_volume, sound_volume, main_game_progress)
-       << "  VideoQual: " << std::format("{}\n\n", bool_as_str(video_quality_flag));
+       << std::format("  Musik:     {}, {}\n", bool_as_str(is_music_enabled), music_bitmask)
+       << std::format("  Samples:   {}\n", bool_as_str(is_sound_enabled))
+       << std::format("  Random:    {}\n", bool_as_str(is_music_shuffle_enabled))
+       << std::format("  Volume:    {}, {}, {}\n", music_volume, sound_volume, main_game_progress)
+       << std::format("  VideoQual: {}\n\n", bool_as_str(video_quality_flag));
  
     // Disabled music tracks
     for (int track_id : disabled_music_tracks)
     {
-        ss << "  Song:     " << std::format("{}, FALSE\n", track_id);
+        ss << std::format("  Song:     {}, FALSE\n", track_id);
     }
     ss << "  \n";
  
     // Disabled speech
     for (int i = 0; i < num_speech_categories; i++)
     {
-        ss << "  Speach:    " << std::format("{}, {}\n", i, bool_as_str(disabled_speech[i]));
+        ss << std::format("  Speach:    {}, {}\n", i, bool_as_str(disabled_speech[i]));
     }
     ss << "  \n";
 
     // Disabled videos
     for (int i = 0; i < num_video_categories; i++)
     {
-        ss << "  Video:     " << std::format("{}, {}\n", i, bool_as_str(disabled_videos[i]));
+        ss << std::format("  Video:     {}, {}\n", i, bool_as_str(disabled_videos[i]));
     }
     ss << "  \n";
 
     // Autosave file location
-    ss << "  Lastfile: " << std::format("\"{}\"\n\n", last_save_file);
+    ss << std::format("  Lastfile: \"{}\"\n\n", last_save_file);
 
     // Continuous Play / Tutorial selection
-    ss << "  Endlosnr: " << std::format("{}\n", continuous_play_selection)
-       << "  Tutornr:  " << std::format("{}\n\n", tutorial_selection);
+    ss << std::format("  Endlosnr: {}\n", continuous_play_selection)
+       << std::format("  Tutornr:  {}\n\n", tutorial_selection);
 
     // Campaign progress
     for (const auto& [campaign_index, progress] : campaign_progress)
     {
-        ss << "  Kampagne: " << std::format("{}, {}\n", campaign_index, progress);
+        ss << std::format("  Kampagne: {}, {}\n", campaign_index, progress);
     }
     ss << "  \n";
 
@@ -393,8 +400,8 @@ void GameDatFile::save(const std::filesystem::path& path)
         for (int i = 0; i < num_savegames; i++)
         {
             const auto& save_slot = save_slots[i];
-            // TODO: spaces should shrink for double digit indices
-            ss << "    Name:      " << std::format("{}, \"{}\", {}\n", i, save_slot.name, save_slot.num_players);
+            // `:>7` is used to add padding dynamically, since the number of spaces is not fixed
+            ss << std::format("    Name:{:>7}, \"{}\", {}\n", i, save_slot.name, save_slot.num_players);
         }
         ss << "  \n  EndObj;\n\n";
     }
@@ -402,5 +409,25 @@ void GameDatFile::save(const std::filesystem::path& path)
     FileUtils::write_text_file(path, ss.str());
 }
 /* clang-format on */
+
+void GameDatFile::set_main_game_progress(int progress)
+{
+    main_game_progress = std::clamp(progress, new_game_progress, completed_game_progress);
+}
+
+int GameDatFile::get_campaign_progress(int campaign_index) const
+{
+    const auto it = campaign_progress.find(campaign_index);
+    if (it == campaign_progress.cend())
+    {
+        return 0;
+    }
+    return it->second;
+}
+
+void GameDatFile::set_campaign_progress(int campaign_index, int progress)
+{
+    campaign_progress[campaign_index] = progress;
+}
 
 }  // namespace Anno
