@@ -29,6 +29,7 @@ set(HDR_FILES
     include/files/file_utils.h
     include/files/game_dat_file.h
     include/platform/windows/windows_config.h
+    include/tool/config.h
     include/tool/tool.h
 )
 

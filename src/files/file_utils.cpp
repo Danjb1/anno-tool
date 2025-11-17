@@ -117,6 +117,25 @@ void write_binary_file(const std::filesystem::path& path, const std::vector<char
     }
 }
 
+void write_text_file(const std::filesystem::path& path, const std::string& text)
+{
+    // Try to open the file
+    std::ofstream file_stream(path, std::ios::binary);
+    if (!file_stream)
+    {
+        throw std::ios_base::failure("Failed to open file for writing: " + path.string());
+    }
+
+    // Write file
+    file_stream.write(text.data(), text.size());
+
+    // Check for write errors
+    if (!file_stream)
+    {
+        throw std::ios_base::failure("Error writing file: " + path.string());
+    }
+}
+
 void write_text_file(const std::filesystem::path& path, const std::vector<std::string>& lines)
 {
     // Try to open the file

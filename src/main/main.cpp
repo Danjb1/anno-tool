@@ -7,6 +7,7 @@
 #include "files/cod_file.h"
 #include "files/file_utils.h"
 #include "files/game_dat_file.h"
+#include "tool/config.h"
 #include "tool/tool.h"
 
 namespace po = boost::program_options;
@@ -77,7 +78,7 @@ int main(int argc, char* argv[])
     // cod_file.save_encoded("C:/tmp/encoded.cod");
 
     // TMP
-    GameDatFile dat_file(cfg.user_dir / "Game.dat");
+    GameDatFile dat_file(cfg.user_dir / "Game.dat", cfg.version);
     dat_file.save("C:/tmp/Game.dat");
 
     return 0;
