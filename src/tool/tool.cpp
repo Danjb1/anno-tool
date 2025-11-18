@@ -16,6 +16,13 @@ Tool::Tool(const Config& cfg)
 
 std::vector<Campaign> Tool::get_installed_campaigns() const
 {
+    // TMP
+    const auto campaign_data = text_cod.get_section_contents("KAMPAGNE");
+    for (const auto& line : campaign_data)
+    {
+        std::cout << line << "\n";
+    }
+
     // TODO: read from text.cod
     std::cout << "Not implemented yet!\n";
     return {};

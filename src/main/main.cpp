@@ -4,9 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "files/cod_file.h"
 #include "files/file_utils.h"
-#include "files/game_dat_file.h"
 #include "tool/config.h"
 #include "tool/tool.h"
 
@@ -80,6 +78,7 @@ int main(int argc, char* argv[])
 
     // TMP
     Tool tool(cfg);
+    tool.get_installed_campaigns();
     std::cout << "Main game progress = " << tool.get_main_game_progress();
 
     return 0;

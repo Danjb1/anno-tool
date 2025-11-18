@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "files/cod_file.h"
 #include "files/game_dat_file.h"
+#include "files/text_cod_file.h"
 #include "tool/config.h"
 
 namespace Anno {
@@ -55,7 +55,7 @@ public:
 private:
     Config cfg;
     GameDatFile game_dat_file;
-    CodFile text_cod;
+    TextCodFile text_cod;
     std::vector<Campaign> installed_campaigns;
 };
 

@@ -16,18 +16,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Declare source files
 set(SRC_FILES
-    src/files/cod_file.cpp
     src/files/file_utils.cpp
     src/files/game_dat_file.cpp
+    src/files/text_cod_file.cpp
     src/main/main.cpp
     src/tool/tool.cpp
 )
 
 # Declare header files
 set(HDR_FILES
-    include/files/cod_file.h
     include/files/file_utils.h
     include/files/game_dat_file.h
+    include/files/text_cod_file.h
     include/tool/config.h
     include/tool/tool.h
 )
