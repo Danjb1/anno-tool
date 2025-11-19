@@ -10,16 +10,15 @@
 
 namespace Anno {
 
-struct CampaignLevel
-{
-    std::string name;
-    std::filesystem::path path;
-};
-
 struct Campaign
 {
+    Campaign(const std::string& name)
+        : name(name)
+    {
+    }
+
     std::string name;
-    std::vector<CampaignLevel> levels;
+    std::vector<std::string> level_names;
 };
 
 class Tool
@@ -53,6 +52,8 @@ public:
     void save_player_data();
 
 private:
+    void parse_campaigns();
+
     Config cfg;
     GameDatFile game_dat_file;
     TextCodFile text_cod;

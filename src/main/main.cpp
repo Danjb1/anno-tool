@@ -76,9 +76,20 @@ int main(int argc, char* argv[])
         }
     }
 
-    // TMP
     Tool tool(cfg);
-    tool.get_installed_campaigns();
+
+    // TMP
+    const auto installed_campaigns = tool.get_installed_campaigns();
+    for (int i = 0; i < installed_campaigns.size(); ++i)
+    {
+        const auto& campaign = installed_campaigns[i];
+        std::cout << "Campaign: " << campaign.name << " (Progress = " << tool.get_campaign_progress(i) << ")\n";
+        for (const auto& level_name : campaign.level_names)
+        {
+            std::cout << "  " << level_name << "\n";
+        }
+    }
+
     std::cout << "Main game progress = " << tool.get_main_game_progress();
 
     return 0;

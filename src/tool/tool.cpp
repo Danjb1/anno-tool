@@ -12,20 +12,40 @@ Tool::Tool(const Config& cfg)
     , game_dat_file(cfg.user_dir / "Game.dat", cfg.version)
     , text_cod(cfg.anno_dir / "text.cod")
 {
+    parse_campaigns();
+}
+
+void Tool::parse_campaigns()
+{
+    const auto campaign_data = text_cod.get_section_contents("KAMPAGNE");
+
+    int campaign_index = 0;
+    int last_campaign_index = -1;
+
+    for (const auto& line : campaign_data)
+    {
+        // Skip blank lines
+        if (line.empty())
+        {
+            campaign_index = last_campaign_index + 1;
+            continue;
+        }
+
+        if (installed_campaigns.size() <= campaign_index)
+        {
+            // Found new campaign
+            installed_campaigns.emplace_back("TODO: Campaign Name");
+        }
+
+        // Add level to campaign
+        installed_campaigns[campaign_index].level_names.push_back(line);
+        last_campaign_index = campaign_index;
+    }
 }
 
 std::vector<Campaign> Tool::get_installed_campaigns() const
 {
-    // TMP
-    const auto campaign_data = text_cod.get_section_contents("KAMPAGNE");
-    for (const auto& line : campaign_data)
-    {
-        std::cout << line << "\n";
-    }
-
-    // TODO: read from text.cod
-    std::cout << "Not implemented yet!\n";
-    return {};
+    return installed_campaigns;
 }
 
 void Tool::install_campaign(const Campaign& campaign) const
