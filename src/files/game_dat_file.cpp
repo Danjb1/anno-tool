@@ -26,7 +26,7 @@ std::string extract_value(const std::string& line)
     if (split_pos == std::string::npos)
     {
         // line does not contain a colon
-        std::cerr << "Failed to extract value from line: " << line << "\n";
+        std::cerr << "Failed to extract value from line: " << line << '\n';
         return "";
     }
 
@@ -46,7 +46,7 @@ bool extract_multipart_value(const std::string& line, /* out */ std::vector<std:
     boost::algorithm::split_regex(parts, value, boost::regex(",\\s*"));
     if (parts.size() != expected_num_parts)
     {
-        std::cerr << "Failed to find " << expected_num_parts << " values in line: " << line << "\n";
+        std::cerr << "Failed to find " << expected_num_parts << " values in line: " << line << '\n';
         return false;
     }
 
@@ -143,7 +143,7 @@ void GameDatFile::read_dat_file(const std::filesystem::path& path)
         }
         else
         {
-            std::cerr << "Encountered unexpected setting: " << line << "\n";
+            std::cerr << "Encountered unexpected setting: " << line << '\n';
         }
     }
 }
@@ -165,7 +165,7 @@ int GameDatFile::parse_int_setting(const std::string& line, int default_value) c
     catch (const std::logic_error& err)
     {
         std::cerr << "Failed to parse int value: " << err.what() << '\n'  //
-                  << " in line: " << line << "\n";
+                  << " in line: " << line << '\n';
         return default_value;
     }
 }
@@ -351,7 +351,7 @@ void GameDatFile::save_to_path(const std::filesystem::path& path)
     std::stringstream ss;
 
     // General settings
-    ss << "\n"
+    ss << '\n'
        << std::format("  Musik:     {}, {}\n", bool_as_str(is_music_enabled), music_bitmask)
        << std::format("  Samples:   {}\n", bool_as_str(is_sound_enabled))
        << std::format("  Random:    {}\n", bool_as_str(is_music_shuffle_enabled))

@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     // Help text
     if (vm.count("help"))
     {
-        std::cout << desc << "\n";
+        std::cout << desc << '\n';
         return 1;
     }
 
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
         std::cout << "Campaign: " << campaign.name << " (Progress = " << tool.get_campaign_progress(i) << ")\n";
         for (const auto& level_name : campaign.level_names)
         {
-            std::cout << "  " << level_name << "\n";
+            std::cout << "  " << level_name << '\n';
         }
     }
 

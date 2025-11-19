@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "files/game_dat_file.h"
+#include "files/scenario_file.h"
 #include "files/text_cod_file.h"
 #include "tool/config.h"
 
@@ -52,11 +53,13 @@ public:
     void save_player_data();
 
 private:
+    void read_scenarios();
     void parse_campaigns();
 
     Config cfg;
     GameDatFile game_dat_file;
     TextCodFile text_cod;
+    std::vector<ScenarioFile> installed_scenarios;
     std::vector<Campaign> installed_campaigns;
 };
 

@@ -12,7 +12,18 @@ Tool::Tool(const Config& cfg)
     , game_dat_file(cfg.user_dir / "Game.dat", cfg.version)
     , text_cod(cfg.anno_dir / "text.cod")
 {
+    read_scenarios();
     parse_campaigns();
+}
+
+void Tool::read_scenarios()
+{
+    // TMP
+    ScenarioFile scenario_file = cfg.anno_dir / "Szenes" / "On His Majesty's Service1.szs";
+    std::cout << "campaign index = " << scenario_file.get_campaign_index() << '\n';
+
+    // TODO: read all scenarios in Szenes folder
+    // scenarios.emplace_back(cfg.anno_dir / "Szenes" / ...);
 }
 
 void Tool::parse_campaigns()
