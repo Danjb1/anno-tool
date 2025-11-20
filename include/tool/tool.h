@@ -26,10 +26,10 @@ public:
     std::vector<Campaign> get_installed_campaigns() const;
 
     /** Installs a campaign. */
-    void install_campaign(const Campaign& campaign) const;
+    bool install_campaign(const Campaign& campaign);
 
     /** Uninstalls a campaign. */
-    void uninstall_campaign(const Campaign& campaign) const;
+    void uninstall_campaign(const Campaign& campaign);
 
     /** Gets the player's progress in the main game. */
     int get_main_game_progress() const;
@@ -43,9 +43,6 @@ public:
     /** Sets the player's progress in a campaign.
      * Changes will not be saved to disk until `save_player_data` is called. */
     void set_campaign_progress(int campaign_index, int progress);
-
-    /** Saves the player data (contained within Game.dat) to disk. */
-    void save_player_data();
 
 private:
     void read_installed_scenarios();

@@ -99,7 +99,7 @@ void Tool::read_installed_scenarios()
 
 void Tool::parse_campaign_level_names()
 {
-    const auto campaign_data = text_cod.get_section_contents("KAMPAGNE");
+    const auto campaign_data = text_cod.get_section_contents(TextCodFile::section_campaign);
 
     int campaign_index = 0;
     int last_campaign_index = -1;
@@ -130,17 +130,76 @@ std::vector<Campaign> Tool::get_installed_campaigns() const
     return installed_campaigns;
 }
 
-void Tool::install_campaign(const Campaign& campaign) const
+// TODO: Failure inside this method could leave the program / game files in a weird state
+bool Tool::install_campaign(const Campaign& campaign)
 {
-    // TODO: copy scenarios to "Szenes" folder
-    // TODO: add entries to text.cod
-    // TODO: add entry to Game.dat
-    std::cout << "Not implemented yet!\n";
+    int campaign_index = static_cast<int>(installed_campaigns.size());
+
+    /*
+     * 1. Add level names to `text.cod`
+     */
+
+    std::cout << "Adding level names to text.cod...\n";
+    auto campaign_data = text_cod.get_section_contents(TextCodFile::section_campaign);
+    campaign_data.push_back("");  // blank line
+    for (const auto& level_name : campaign.level_names)
+    {
+        campaign_data.push_back(level_name);
+    }
+    campaign_data.push_back("");
+    text_cod.set_section_contents(TextCodFile::section_campaign, campaign_data);
+    try
+    {
+        text_cod.save_overwrite();
+    }
+    catch (const std::ios_base::failure& e)
+    {
+        std::cout << "Failed to write to text.cod: " << e.what();
+        return false;
+    }
+
+    /*
+     * 2. Modify scenario files
+     */
+
+    std::cout << "Linking scenarios to campaign...\n";
+    std::vector<ScenarioFile> scenarios_in_campaign;  // TODO: look up scenarios based on campaign name
+    for (auto& scenario_file : scenarios_in_campaign)
+    {
+        scenario_file.set_campaign_index(campaign_index);
+        try
+        {
+            scenario_file.save_overwrite();
+        }
+        catch (const std::ios_base::failure& e)
+        {
+            std::cout << "Failed to write to " << scenario_file.get_filename() << ": " << e.what();
+            return false;
+        }
+    }
+
+    /*
+     * 3. Add entry to Game.dat
+     */
+
+    std::cout << "Adding entry to Game.dat...\n";
+    game_dat_file.set_campaign_progress(campaign_index, 0);
+    try
+    {
+        game_dat_file.save_overwrite();
+    }
+    catch (const std::ios_base::failure& e)
+    {
+        std::cout << "Failed to write to Game.dat: " << e.what();
+        return false;
+    }
+
+    std::cout << "Success!\n";
+    return true;
 }
 
-void Tool::uninstall_campaign(const Campaign& campaign) const
+void Tool::uninstall_campaign(const Campaign& campaign)
 {
-    // TODO: remove scenarios from "Szenes" folder
     // TODO: remove entries from text.cod
     // TODO: remove entry from Game.dat
     // TODO: adjust indices of all subsequent campaign progress entries in Game.dat
@@ -165,11 +224,6 @@ int Tool::get_campaign_progress(int campaign_index) const
 void Tool::set_campaign_progress(int campaign_index, int progress)
 {
     game_dat_file.set_campaign_progress(campaign_index, progress);
-}
-
-void Tool::save_player_data()
-{
-    game_dat_file.save_overwrite();
 }
 
 }  // namespace Anno

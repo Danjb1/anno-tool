@@ -37,6 +37,7 @@ static std::string strip_enclosing_brackets(const std::string& line)
  */
 
 TextCodFile::TextCodFile(const std::filesystem::path& path)
+    : src_path(path)
 {
     read_cod_file(path);
 }
@@ -82,11 +83,8 @@ void TextCodFile::read_cod_file(const std::filesystem::path& path)
         }
         else if (is_section_name(line))
         {
-            // New section
             std::string section_name = strip_enclosing_brackets(line);
-            sections.emplace_back(section_name);
-            current_section_index = static_cast<int>(sections.size()) - 1;
-            section_map.emplace(section_name, current_section_index);
+            current_section_index = add_new_section(section_name);
         }
 
         // Skip past the EOL characters to the next line
@@ -95,6 +93,19 @@ void TextCodFile::read_cod_file(const std::filesystem::path& path)
 
     // NOTE: If start < buffer.size() then it means the buffer ended with a non-terminated line which we did not
     // process. We ignore this for now as it doesn't matter in practice.
+}
+
+int TextCodFile::add_new_section(std::string_view section_name)
+{
+    sections.emplace_back(std::string(section_name));
+    int section_index = static_cast<int>(sections.size()) - 1;
+    section_map.emplace(std::string(section_name), section_index);
+    return section_index;
+}
+
+void TextCodFile::save_overwrite()
+{
+    save_encoded(src_path);
 }
 
 void TextCodFile::save_plain_text(const std::filesystem::path& path)
@@ -138,7 +149,7 @@ std::vector<char> TextCodFile::make_buffer(bool should_encode_chars) const
     return data;
 }
 
-std::vector<std::string> TextCodFile::get_section_contents(const std::string& section_name) const
+std::vector<std::string> TextCodFile::get_section_contents(std::string_view section_name) const
 {
     const auto it = section_map.find(section_name);
     if (it == section_map.cend())
@@ -149,6 +160,24 @@ std::vector<std::string> TextCodFile::get_section_contents(const std::string& se
 
     int section_index = it->second;
     return sections[section_index].lines;
+}
+
+void TextCodFile::set_section_contents(std::string_view section_name, std::vector<std::string> lines)
+{
+    int section_index = -1;
+
+    auto it = section_map.find(section_name);
+    if (it == section_map.cend())
+    {
+        // Section not found
+        section_index = add_new_section(section_name);
+    }
+    else
+    {
+        section_index = it->second;
+    }
+
+    sections[section_index].lines = lines;
 }
 
 }  // namespace Anno

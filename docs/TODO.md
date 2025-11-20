@@ -5,7 +5,7 @@
 - Search the registry for the Anno directory if not specified
 - Specify desired function on the command line
 - Install / uninstall campaigns
-- Modify campaign progression
+- Modify campaign (and main game) progression
 
 ## Advanced Functionality
 
