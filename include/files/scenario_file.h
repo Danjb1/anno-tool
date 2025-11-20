@@ -19,7 +19,11 @@ namespace Anno {
 class ScenarioFile
 {
 public:
+    /** Creates a ScenarioFile by reading a file on disk.
+     * May throw a std::ios_base::failure. */
     ScenarioFile(const std::filesystem::path& path);
+
+    std::string get_filename() const;
 
     int get_campaign_index() const
     {

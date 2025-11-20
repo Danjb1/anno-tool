@@ -19,3 +19,54 @@ A tool for parsing and editing the files of Anno 1602.
     ```
     cmake --build build
     ```
+
+## Usage
+
+### List Installed Campaigns
+
+**Example:**
+
+```
+AnnoTool --anno-dir="C:/Anno 1602"
+```
+
+
+**Sample Output:**
+
+```
+Found Anno 1602 installation
+
+Installed campaigns:
+
+  New Horizons (Progress = 0)
+    Halfway there
+    To Each his Island
+    Appearance can be deceiving
+    Hard Times
+
+  Trust no one (Progress = 0)
+    Humility is a Virtue
+    The Blinding
+    The Thief
+
+  The Magnate (Progress = 0)
+    Gold Rush
+    Spice Monopoly
+    Dangerous waters
+
+  Pirata (Progress = 0)
+    Revenge is sweet
+    The saviour
+    Quest for peace
+
+  Unfriendly neighbors (Progress = 0)
+    Break the Monopoly
+    The new Empire
+    Imperial Proclamation
+
+  On His Majesty's Service (Progress = 2)
+    Veni, vidi, vici
+    At all Costs
+    The Deluge
+    Close Quarters
+```

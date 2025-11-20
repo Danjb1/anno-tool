@@ -12,6 +12,29 @@ namespace po = boost::program_options;
 
 using namespace Anno;
 
+static void list_installed_campaigns(const Tool& tool)
+{
+    std::cout << "Installed campaigns:\n\n";
+
+    const auto installed_campaigns = tool.get_installed_campaigns();
+    if (installed_campaigns.empty())
+    {
+        std::cout << "None\n";
+        return;
+    }
+
+    for (int i = 0; i < installed_campaigns.size(); ++i)
+    {
+        const auto& campaign = installed_campaigns[i];
+        std::cout << "  " << campaign.name << " (Progress = " << tool.get_campaign_progress(i) << ")\n";
+        for (const auto& level_name : campaign.level_names)
+        {
+            std::cout << "    " << level_name << '\n';
+        }
+        std::cout << '\n';
+    }
+}
+
 int main(int argc, char* argv[])
 {
     // Define accepted program options
@@ -58,13 +81,13 @@ int main(int argc, char* argv[])
         std::filesystem::path path = std::filesystem::path(anno_dir);
         if (std::filesystem::exists(path / "1602.exe"))
         {
-            std::cout << "Found Anno 1602 directory: " << anno_dir << '\n';
+            std::cout << "Found Anno 1602 installation\n\n";
             cfg.anno_dir = anno_dir;
             cfg.user_dir = anno_dir;
         }
         else if (std::filesystem::exists(path / "Anno1602.exe"))
         {
-            std::cout << "Found Anno 1602 History Edition directory: " << anno_dir << '\n';
+            std::cout << "Found Anno 1602 History Edition installation\n\n";
             cfg.anno_dir = anno_dir;
             cfg.user_dir = FileUtils::get_documents_folder() / "Anno 1602 History Edition";
             cfg.version = GameVersion::HistoryEdition;
@@ -77,20 +100,7 @@ int main(int argc, char* argv[])
     }
 
     Tool tool(cfg);
-
-    // TMP
-    const auto installed_campaigns = tool.get_installed_campaigns();
-    for (int i = 0; i < installed_campaigns.size(); ++i)
-    {
-        const auto& campaign = installed_campaigns[i];
-        std::cout << "Campaign: " << campaign.name << " (Progress = " << tool.get_campaign_progress(i) << ")\n";
-        for (const auto& level_name : campaign.level_names)
-        {
-            std::cout << "  " << level_name << '\n';
-        }
-    }
-
-    std::cout << "Main game progress = " << tool.get_main_game_progress();
+    list_installed_campaigns(tool);
 
     return 0;
 }

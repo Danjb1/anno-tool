@@ -14,7 +14,7 @@ namespace Anno {
 
 // Used to transform from encoded `.cod` format to readable ANSI (and vice versa)
 // See: https://github.com/Green-Sky/anno16_docs/blob/master/file_formats/encryption.md
-void transform_chars(std::vector<char>& buffer)
+static void transform_chars(std::vector<char>& buffer)
 {
     for (int i = 0; i < buffer.size(); ++i)
     {
@@ -22,12 +22,12 @@ void transform_chars(std::vector<char>& buffer)
     }
 }
 
-bool is_section_name(const std::string& line)
+static bool is_section_name(const std::string& line)
 {
     return line.starts_with('[') && line.ends_with(']');
 }
 
-std::string strip_enclosing_brackets(const std::string& line)
+static std::string strip_enclosing_brackets(const std::string& line)
 {
     return line.substr(1, line.size() - 2);
 }

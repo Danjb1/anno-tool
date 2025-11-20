@@ -27,6 +27,8 @@ class TextCodFile
     };
 
 public:
+    /** Creates a TextCodFile by reading a file on disk.
+     * May throw a std::ios_base::failure. */
     TextCodFile(const std::filesystem::path& path);
 
     void save_plain_text(const std::filesystem::path& path);

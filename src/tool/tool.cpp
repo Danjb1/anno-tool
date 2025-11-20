@@ -1,5 +1,6 @@
 #include "tool/tool.h"
 
+#include <ios>
 #include <iostream>
 
 #pragma warning(push)
@@ -7,26 +8,96 @@
 
 namespace Anno {
 
+/*
+ * Helper methods
+ */
+
+static bool is_scenario_file(const std::filesystem::directory_entry& entry)
+{
+    if (!entry.is_regular_file())
+    {
+        // Ignore directories
+        return false;
+    }
+
+    const std::filesystem::path extension = entry.path().extension();
+    return extension == ".szs" || extension == ".szm";
+}
+
+static std::string get_campaign_name(const std::string& scenario_filename)
+{
+    // Just remove the last character, which is the index of the scenario within the campaign
+    return scenario_filename.substr(0, scenario_filename.length() - 1);
+}
+
+/*
+ * Tool class
+ */
+
 Tool::Tool(const Config& cfg)
     : cfg(cfg)
     , game_dat_file(cfg.user_dir / "Game.dat", cfg.version)
     , text_cod(cfg.anno_dir / "text.cod")
 {
-    read_scenarios();
-    parse_campaigns();
+    read_installed_scenarios();
+    parse_campaign_level_names();
 }
 
-void Tool::read_scenarios()
+void Tool::read_installed_scenarios()
 {
-    // TMP
-    ScenarioFile scenario_file = cfg.anno_dir / "Szenes" / "On His Majesty's Service1.szs";
-    std::cout << "campaign index = " << scenario_file.get_campaign_index() << '\n';
+    std::map<int, std::string> campaign_names;
 
-    // TODO: read all scenarios in Szenes folder
-    // scenarios.emplace_back(cfg.anno_dir / "Szenes" / ...);
+    // Read all scenarios in "Szenes" directory
+    for (const auto& entry : std::filesystem::directory_iterator(cfg.anno_dir / "Szenes"))
+    {
+        if (!is_scenario_file(entry))
+        {
+            continue;
+        }
+
+        try
+        {
+            const ScenarioFile& scenario = installed_scenarios.emplace_back(entry.path());
+
+            // Does this scenario belong to a campaign?
+            int campaign_index = scenario.get_campaign_index();
+            if (campaign_index >= 0)
+            {
+                campaign_names.try_emplace(campaign_index, get_campaign_name(scenario.get_filename()));
+            }
+        }
+        catch (const std::ios_base::failure& error)
+        {
+            std::cout << "Failed to read scenario file: " << entry.path() << " (Error: " << error.what() << ")\n";
+        }
+    }
+
+    // If no campaigns found, nothing to do
+    if (campaign_names.empty())
+    {
+        return;
+    }
+
+    // Create campaign entries
+    const int max_campaign_index = campaign_names.rbegin()->first;
+    installed_campaigns.resize(max_campaign_index + 1);
+
+    // Save the campaign names
+    for (int i = 0; i <= max_campaign_index; ++i)
+    {
+        const auto it = campaign_names.find(i);
+        if (it == campaign_names.cend())
+        {
+            std::cerr << "Campaign " << i << " is missing!\n";
+        }
+        else
+        {
+            installed_campaigns[i].name = it->second;
+        }
+    }
 }
 
-void Tool::parse_campaigns()
+void Tool::parse_campaign_level_names()
 {
     const auto campaign_data = text_cod.get_section_contents("KAMPAGNE");
 
@@ -44,8 +115,8 @@ void Tool::parse_campaigns()
 
         if (installed_campaigns.size() <= campaign_index)
         {
-            // Found new campaign
-            installed_campaigns.emplace_back("TODO: Campaign Name");
+            std::cerr << "Found level names for non-existant campaign: " << campaign_index << '\n';
+            installed_campaigns.emplace_back("[Missing Campaign]");
         }
 
         // Add level to campaign

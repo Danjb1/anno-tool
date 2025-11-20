@@ -13,11 +13,6 @@ namespace Anno {
 
 struct Campaign
 {
-    Campaign(const std::string& name)
-        : name(name)
-    {
-    }
-
     std::string name;
     std::vector<std::string> level_names;
 };
@@ -53,8 +48,8 @@ public:
     void save_player_data();
 
 private:
-    void read_scenarios();
-    void parse_campaigns();
+    void read_installed_scenarios();
+    void parse_campaign_level_names();
 
     Config cfg;
     GameDatFile game_dat_file;

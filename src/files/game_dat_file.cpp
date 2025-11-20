@@ -20,7 +20,7 @@ namespace Anno {
  * Helper methods
  */
 
-std::string extract_value(const std::string& line)
+static std::string extract_value(const std::string& line)
 {
     const auto split_pos = line.find(':');
     if (split_pos == std::string::npos)
@@ -35,7 +35,8 @@ std::string extract_value(const std::string& line)
     return value;
 }
 
-bool extract_multipart_value(const std::string& line, /* out */ std::vector<std::string>& parts, int expected_num_parts)
+static bool extract_multipart_value(
+        const std::string& line, /* out */ std::vector<std::string>& parts, int expected_num_parts)
 {
     const std::string value = extract_value(line);
     if (value.empty())
@@ -53,12 +54,12 @@ bool extract_multipart_value(const std::string& line, /* out */ std::vector<std:
     return true;
 }
 
-void trim_quotes(std::string& line)
+static void trim_quotes(std::string& line)
 {
     boost::trim_if(line, boost::is_any_of("\""));
 }
 
-std::string bool_as_str(bool b)
+static std::string bool_as_str(bool b)
 {
     return b ? "TRUE" : "FALSE";
 }

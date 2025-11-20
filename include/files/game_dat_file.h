@@ -24,6 +24,8 @@ class GameDatFile
     };
 
 public:
+    /** Creates a GameDatFile by reading a file on disk.
+     * May throw a std::ios_base::failure. */
     GameDatFile(const std::filesystem::path& path, GameVersion game_version);
 
     void save_overwrite();
