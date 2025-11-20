@@ -168,9 +168,6 @@ bool Tool::install_campaign(const Campaign& campaign)
     try
     {
         text_cod.save_overwrite();
-
-        // TMP
-        text_cod.save_plain_text("C:/tmp/text.cod.modified");
     }
     catch (const std::ios_base::failure& e)
     {
