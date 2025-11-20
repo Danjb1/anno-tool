@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "files/game_dat_file.h"
@@ -13,6 +14,10 @@ namespace Anno {
 
 struct Campaign
 {
+    // NOTE: Some "campaigns" in the unofficial expansion "By Royal Command" have 5 levels,
+    // but the game can only display up to 4.
+    static constexpr int max_levels = 4;
+
     std::string name;
     std::vector<std::string> level_names;
 };
@@ -51,7 +56,7 @@ private:
     Config cfg;
     GameDatFile game_dat_file;
     TextCodFile text_cod;
-    std::vector<ScenarioFile> installed_scenarios;
+    std::unordered_map<std::string, ScenarioFile> installed_scenarios;
     std::vector<Campaign> installed_campaigns;
 };
 

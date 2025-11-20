@@ -135,7 +135,8 @@ std::vector<char> TextCodFile::make_buffer(bool should_encode_chars) const
             oss << line << "\r\n";
         }
 
-        oss << "--------------------------------------------------\r\n";
+        oss << "[END]\r\n"
+               "--------------------------------------------------\r\n";
     }
 
     std::string temp = oss.str();

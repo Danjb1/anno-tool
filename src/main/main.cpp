@@ -102,5 +102,10 @@ int main(int argc, char* argv[])
     Tool tool(cfg);
     list_installed_campaigns(tool);
 
+    // TMP
+    // Campaign campaign { "Beyond the Stone Guardians" };
+    // campaign.level_names = { "Doomed", "Escape from Paradise", "Empty-handed", "A Plan is Maturing" };
+    // tool.install_campaign(campaign);
+
     return 0;
 }

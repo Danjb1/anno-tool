@@ -3,9 +3,6 @@
 #include <ios>
 #include <iostream>
 
-#pragma warning(push)
-#pragma warning(disable : 4100)  // TMP: Suppress unused parameter warnings for now
-
 namespace Anno {
 
 /*
@@ -57,13 +54,17 @@ void Tool::read_installed_scenarios()
 
         try
         {
-            const ScenarioFile& scenario = installed_scenarios.emplace_back(entry.path());
+            // Create and store a ScenarioFile
+            std::string scenario_filename = entry.path().stem().string();
+            auto [it, was_inserted] = installed_scenarios.emplace(scenario_filename, entry.path());
+            ScenarioFile& scenario = it->second;
 
             // Does this scenario belong to a campaign?
             int campaign_index = scenario.get_campaign_index();
+            // TODO: sanity check campaign_index in case of a corrupted file
             if (campaign_index >= 0)
             {
-                campaign_names.try_emplace(campaign_index, get_campaign_name(scenario.get_filename()));
+                campaign_names.try_emplace(campaign_index, get_campaign_name(scenario_filename));
             }
         }
         catch (const std::ios_base::failure& error)
@@ -133,6 +134,22 @@ std::vector<Campaign> Tool::get_installed_campaigns() const
 // TODO: Failure inside this method could leave the program / game files in a weird state
 bool Tool::install_campaign(const Campaign& campaign)
 {
+    /*
+     * 0. Sanity check
+     */
+
+    if (campaign.name.empty() || campaign.level_names.empty())
+    {
+        std::cerr << "Invalid campaign data!\n";
+        return false;
+    }
+
+    if (campaign.level_names.size() > Campaign::max_levels)
+    {
+        std::cerr << "Too many levels in campaign!\n";
+        return false;
+    }
+
     int campaign_index = static_cast<int>(installed_campaigns.size());
 
     /*
@@ -151,10 +168,13 @@ bool Tool::install_campaign(const Campaign& campaign)
     try
     {
         text_cod.save_overwrite();
+
+        // TMP
+        text_cod.save_plain_text("C:/tmp/text.cod.modified");
     }
     catch (const std::ios_base::failure& e)
     {
-        std::cout << "Failed to write to text.cod: " << e.what();
+        std::cerr << "Failed to write to text.cod: " << e.what() << '\n';
         return false;
     }
 
@@ -163,9 +183,17 @@ bool Tool::install_campaign(const Campaign& campaign)
      */
 
     std::cout << "Linking scenarios to campaign...\n";
-    std::vector<ScenarioFile> scenarios_in_campaign;  // TODO: look up scenarios based on campaign name
-    for (auto& scenario_file : scenarios_in_campaign)
+    for (int i = 0; i < campaign.level_names.size(); ++i)
     {
+        std::string scenario_name = campaign.name + std::to_string(i);
+        auto it = installed_scenarios.find(scenario_name);
+        if (it == installed_scenarios.cend())
+        {
+            std::cerr << "Did not find expected scenario file: " << scenario_name << '\n';
+            return false;
+        }
+
+        ScenarioFile& scenario_file = it->second;
         scenario_file.set_campaign_index(campaign_index);
         try
         {
@@ -173,7 +201,7 @@ bool Tool::install_campaign(const Campaign& campaign)
         }
         catch (const std::ios_base::failure& e)
         {
-            std::cout << "Failed to write to " << scenario_file.get_filename() << ": " << e.what();
+            std::cerr << "Failed to write to " << scenario_file.get_filename() << ": " << e.what() << '\n';
             return false;
         }
     }
@@ -190,7 +218,7 @@ bool Tool::install_campaign(const Campaign& campaign)
     }
     catch (const std::ios_base::failure& e)
     {
-        std::cout << "Failed to write to Game.dat: " << e.what();
+        std::cerr << "Failed to write to Game.dat: " << e.what() << '\n';
         return false;
     }
 
@@ -198,7 +226,7 @@ bool Tool::install_campaign(const Campaign& campaign)
     return true;
 }
 
-void Tool::uninstall_campaign(const Campaign& campaign)
+void Tool::uninstall_campaign(const Campaign&)
 {
     // TODO: remove entries from text.cod
     // TODO: remove entry from Game.dat
@@ -227,5 +255,3 @@ void Tool::set_campaign_progress(int campaign_index, int progress)
 }
 
 }  // namespace Anno
-
-#pragma warning(pop)

@@ -2,9 +2,11 @@
 
 ## Basic Functionality
 
+- `ScenarioFile::update_data` is not fully implemented
 - Search the registry for the Anno directory if not specified
 - Specify desired function on the command line
-- Install / uninstall campaigns
+- Read campaign info from a file (e.g. `.cmp` files) when installing a campaign
+- Uninstall campaigns
 - Modify campaign (and main game) progression
 
 ## Advanced Functionality

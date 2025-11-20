@@ -1,5 +1,7 @@
 #include "files/scenario_file.h"
 
+#include <cstdint>
+
 #include "files/file_utils.h"
 
 namespace Anno {
@@ -62,9 +64,41 @@ void ScenarioFile::save_to_path(const std::filesystem::path& path)
 
 void ScenarioFile::update_data()
 {
-    // TODO: remove campaign chunk if no longer needed
-    // TODO: add campaign chunk if needed and not present
-    // TODO: update campaign chunk if modified
+    if (campaign_index >= 0)
+    {
+        // We need to prepend the campaign chunk to the existing data
+        // TODO: only do this if the campaign chunk was not already present! Otherwise, modify the header instead.
+        std::vector<char> new_data;
+        new_data.reserve(data.size() + 24);
+
+        // Write campaign chunk header followed by 2 bytes of padding
+        new_data.insert(new_data.end(),
+                campaign_chunk_header.data(),
+                campaign_chunk_header.data() + campaign_chunk_header.size());
+        new_data.insert(new_data.end(), '\0');
+        new_data.insert(new_data.end(), '\0');
+
+        // Write chunk size
+        std::int32_t chunk_size = 4;
+        new_data.insert(new_data.end(),
+                reinterpret_cast<const char*>(&chunk_size),
+                reinterpret_cast<const char*>(&chunk_size) + sizeof(chunk_size));
+
+        // Write campaign index
+        std::int32_t campaign_index_int32 = campaign_index;
+        new_data.insert(new_data.end(),
+                reinterpret_cast<const char*>(&campaign_index_int32),
+                reinterpret_cast<const char*>(&campaign_index_int32) + sizeof(campaign_index_int32));
+
+        // Write the rest of the data
+        new_data.insert(new_data.end(), data.begin(), data.end());
+
+        data = new_data;
+    }
+    else
+    {
+        // TODO: remove campaign chunk if no longer needed
+    }
 }
 
 }  // namespace Anno
