@@ -36,7 +36,7 @@ A tool for parsing and editing the files of Anno 1602.
 AnnoTool --help
 ```
 
-**Sample Output**
+**Output**
 
 ```
 Accepted options:
@@ -57,10 +57,10 @@ This lists all campaigns that are currently installed.
 **Example**
 
 ```bat
-AnnoTool --anno-dir="C:/Anno 1602"
+AnnoTool --anno-dir="C:/Anno 1602" --list-campaigns
 ```
 
-**Sample Output**
+**Output**
 
 ```
 Found Anno 1602 installation
@@ -115,9 +115,10 @@ Gold of Natives
 The corresponding scenario files should be placed in the `Szenes` folder and named according to the campaign:
 
 ```
-From the Ashes0.szs
-From the Ashes1.szs
-From the Ashes2.szs
++-- Szenes/
+    +-- From the Ashes0.szs
+    +-- From the Ashes1.szs
+    +-- From the Ashes2.szs
 ```
 
 The definition file can be safely deleted once the campaign is installed.
@@ -128,7 +129,7 @@ The definition file can be safely deleted once the campaign is installed.
 AnnoTool --anno-dir="C:/Anno 1602" --install-campaign "From the Ashes.cmp"
 ```
 
-**Sample Output**
+**Output**
 
 ```
 Found Anno 1602 installation
