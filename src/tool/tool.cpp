@@ -59,17 +59,21 @@ void Tool::read_installed_scenarios()
             auto [it, was_inserted] = installed_scenarios.emplace(scenario_filename, entry.path());
             ScenarioFile& scenario = it->second;
 
-            // Does this scenario belong to a campaign?
-            int campaign_index = scenario.get_campaign_index();
-            // TODO: sanity check campaign_index in case of a corrupted file
-            if (campaign_index >= 0)
+            const int campaign_index = scenario.get_campaign_index();
+            if (campaign_index > max_campaign_index)
             {
+                // Ignore excessive campaign numbers, this this is a sign of a corrupted file
+                std::cerr << "Scenario file is corrupted: " << entry.path() << ")\n";
+            }
+            else if (campaign_index >= 0)
+            {
+                // Scenario belongs to a campaign
                 campaign_names.try_emplace(campaign_index, get_campaign_name(scenario_filename));
             }
         }
         catch (const std::ios_base::failure& error)
         {
-            std::cout << "Failed to read scenario file: " << entry.path() << " (Error: " << error.what() << ")\n";
+            std::cerr << "Failed to read scenario file: " << entry.path() << "\nError: " << error.what() << '\n';
         }
     }
 
@@ -80,15 +84,17 @@ void Tool::read_installed_scenarios()
     }
 
     // Create campaign entries
-    const int max_campaign_index = campaign_names.rbegin()->first;
-    installed_campaigns.resize(max_campaign_index + 1);
+    const int max_campaign_index_found = campaign_names.rbegin()->first;
+    installed_campaigns.resize(max_campaign_index_found + 1);
 
     // Save the campaign names
-    for (int i = 0; i <= max_campaign_index; ++i)
+    for (int i = 0; i <= max_campaign_index_found; ++i)
     {
         const auto it = campaign_names.find(i);
         if (it == campaign_names.cend())
         {
+            // For what it's worth, the game DOES allow non-consecutive campaign numbers,
+            // but this is normally a sign that something has gone wrong.
             std::cerr << "Campaign " << i << " is missing!\n";
         }
         else
@@ -227,7 +233,7 @@ void Tool::uninstall_campaign(const Campaign&)
 {
     // TODO: remove entries from text.cod
     // TODO: remove entry from Game.dat
-    // TODO: adjust indices of all subsequent campaign progress entries in Game.dat
+    // TODO: adjust indices of all subsequent campaign progress entries in Game.dat and scenario files (?)
     std::cout << "Not implemented yet!\n";
 }
 

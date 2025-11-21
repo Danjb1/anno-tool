@@ -20,8 +20,9 @@ set(SRC_FILES
     src/files/game_dat_file.cpp
     src/files/scenario_file.cpp
     src/files/text_cod_file.cpp
-    src/main/main.cpp
     src/tool/tool.cpp
+    src/util/buffer_utils.cpp
+    src/main.cpp
 )
 
 # Declare header files
@@ -32,6 +33,7 @@ set(HDR_FILES
     include/files/text_cod_file.h
     include/tool/config.h
     include/tool/tool.h
+    include/util/buffer_utils.h
 )
 
 # Add the executable target

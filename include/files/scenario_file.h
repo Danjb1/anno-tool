@@ -37,13 +37,16 @@ public:
     void update_data();
 
 private:
-    static constexpr std::string_view campaign_chunk_header = "SZENE_KAMPAGNE";
+    static constexpr std::string_view campaign_chunk_header = "SZENE_KAMPAGNE\0\0";
+    static constexpr size_t campaign_chunk_size = 24;
     static constexpr size_t chunk_header_size = 20;
 
     void parse_scenario_data();
+    bool is_campaign_chunk_present(const std::vector<char>& data) const;
+    std::vector<char> prepend_campaign_chunk(const std::vector<char>& data) const;
 
     std::filesystem::path src_path;
-    std::vector<char> data;
+    std::vector<char> file_data;
     int campaign_index = -1;
     bool is_dirty = false;
 };

@@ -3,11 +3,12 @@
 #include <cstdint>
 
 #include "files/file_utils.h"
+#include "util/buffer_utils.h"
 
 namespace Anno {
 
 ScenarioFile::ScenarioFile(const std::filesystem::path& path)
-    : data(FileUtils::read_binary_file(path))
+    : file_data(FileUtils::read_binary_file(path))
     , src_path(path)
 {
     parse_scenario_data();
@@ -20,18 +21,22 @@ std::string ScenarioFile::get_filename() const
 
 void ScenarioFile::parse_scenario_data()
 {
-    std::string_view view(data.data(), data.size());
-
     // Fortunately the campaign chunk is right at the start (if present), so we don't have to parse the whole file.
     // If we ever did want to parse the whole file, it would be best to do this separately on request, because it's
     // useful to be able to read the scenario "header" very quickly.
     // Note that values are stored as little-endian, so big-endian architectures would need to flip the bytes after
     // reading any values.
-    if (view.substr(0, campaign_chunk_header.length()) == campaign_chunk_header)
+    if (is_campaign_chunk_present(file_data))
     {
         // Read the value directly after the chunk header
-        std::memcpy(&campaign_index, &data[chunk_header_size], sizeof(int32_t));
+        std::memcpy(&campaign_index, &file_data[chunk_header_size], sizeof(int32_t));
     }
+}
+
+bool ScenarioFile::is_campaign_chunk_present(const std::vector<char>& data) const
+{
+    std::string_view view(data.data(), data.size());
+    return view.substr(0, campaign_chunk_header.length()) == campaign_chunk_header;
 }
 
 void ScenarioFile::set_campaign_index(int new_campaign_index)
@@ -59,46 +64,45 @@ void ScenarioFile::save_to_path(const std::filesystem::path& path)
         is_dirty = false;
     }
 
-    FileUtils::write_binary_file(path, data);
+    FileUtils::write_binary_file(path, file_data);
 }
 
 void ScenarioFile::update_data()
 {
-    if (campaign_index >= 0)
+    const bool wants_campaign_chunk = (campaign_index >= 0);
+    const bool has_campaign_chunk = is_campaign_chunk_present(file_data);
+
+    if (wants_campaign_chunk)
     {
-        // We need to prepend the campaign chunk to the existing data
-        // TODO: only do this if the campaign chunk was not already present! Otherwise, modify the header instead.
-        std::vector<char> new_data;
-        new_data.reserve(data.size() + 24);
-
-        // Write campaign chunk header followed by 2 bytes of padding
-        new_data.insert(new_data.end(),
-                campaign_chunk_header.data(),
-                campaign_chunk_header.data() + campaign_chunk_header.size());
-        new_data.insert(new_data.end(), '\0');
-        new_data.insert(new_data.end(), '\0');
-
-        // Write chunk size
-        std::int32_t chunk_size = 4;
-        new_data.insert(new_data.end(),
-                reinterpret_cast<const char*>(&chunk_size),
-                reinterpret_cast<const char*>(&chunk_size) + sizeof(chunk_size));
-
-        // Write campaign index
-        std::int32_t campaign_index_int32 = campaign_index;
-        new_data.insert(new_data.end(),
-                reinterpret_cast<const char*>(&campaign_index_int32),
-                reinterpret_cast<const char*>(&campaign_index_int32) + sizeof(campaign_index_int32));
-
-        // Write the rest of the data
-        new_data.insert(new_data.end(), data.begin(), data.end());
-
-        data = new_data;
+        if (has_campaign_chunk)
+        {
+            // Modify the existing campaign header
+            std::memcpy(&file_data[chunk_header_size], &campaign_index, sizeof(int32_t));
+        }
+        else
+        {
+            // Add the campaign header
+            file_data = prepend_campaign_chunk(file_data);
+        }
     }
-    else
+    else if (has_campaign_chunk)
     {
-        // TODO: remove campaign chunk if no longer needed
+        // Remove the campaign header entirely
+        file_data.erase(file_data.begin(), file_data.begin() + campaign_chunk_size);
     }
+}
+
+std::vector<char> ScenarioFile::prepend_campaign_chunk(const std::vector<char>& data) const
+{
+    std::vector<char> new_data;
+    new_data.reserve(data.size() + campaign_chunk_size);
+
+    BufferUtils::append(new_data, campaign_chunk_header);
+    BufferUtils::append(new_data, int32_t { static_cast<std::int32_t>(/* chunk size (bytes) */ 4) });
+    BufferUtils::append(new_data, int32_t { static_cast<std::int32_t>(campaign_index) });
+    BufferUtils::append(new_data, data);
+
+    return new_data;
 }
 
 }  // namespace Anno

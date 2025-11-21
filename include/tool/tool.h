@@ -50,6 +50,8 @@ public:
     void set_campaign_progress(int campaign_index, int progress);
 
 private:
+    static constexpr int max_campaign_index = 512;
+
     void read_installed_scenarios();
     void parse_campaign_level_names();
 

@@ -2,7 +2,6 @@
 
 ## Basic Functionality
 
-- `ScenarioFile::update_data` is not fully implemented
 - Search the registry for the Anno directory if not specified
 - Uninstall campaigns
 - Modify campaign (and main game) progression
