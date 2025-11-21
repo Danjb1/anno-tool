@@ -4,8 +4,6 @@
 
 - `ScenarioFile::update_data` is not fully implemented
 - Search the registry for the Anno directory if not specified
-- Specify desired function on the command line
-- Read campaign info from a file (e.g. `.cmp` files) when installing a campaign
 - Uninstall campaigns
 - Modify campaign (and main game) progression
 
@@ -16,4 +14,8 @@
     - Extract `data/a1he0.rda` (using [RDA Explorer](https://github.com/lysanntranvouez/RDAExplorer), [AnnoRDA](https://github.com/lysanntranvouez/AnnoRDA/tree/master) or this [C RDA Extractor](https://github.com/esno/rda))
     - Parse `texts.xml`
 - Extract graphics (why not?)
+- Display / edit scenario descriptions / goals
+    - The game supports some goals that are not configurable in the editor
+    - "A Princely Test" requires building a Palace / Cathedral
+    - SirHenry's Goal Editor allows setting a required number of Warehouses
 - GUI version
