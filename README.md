@@ -22,15 +22,21 @@ A tool for parsing and editing the files of Anno 1602.
 
 ## 🏃‍♂️ Run
 
-### Display Help Text
+### Contents
 
-#### Example
+> 1. [Show Help Text](#show-help-text)
+> 1. [List Installed Campaigns](#list-installed-campaigns)
+> 1. [Install a Campaign](#install-a-campaign)
+
+### Show Help Text
+
+**Example**
 
 ```bat
 AnnoTool --help
 ```
 
-#### Sample Output
+**Sample Output**
 
 ```
 Accepted options:
@@ -48,13 +54,13 @@ Instructions:
 
 This lists all campaigns that are currently installed.
 
-#### Example
+**Example**
 
 ```bat
 AnnoTool --anno-dir="C:/Anno 1602"
 ```
 
-#### Sample Output
+**Sample Output**
 
 ```
 Found Anno 1602 installation
@@ -96,7 +102,7 @@ Installed campaigns:
 
 > **NOTE:** In the History Edition, localization keys may be returned instead of the campaign names, e.g. `[[103]]`.
 
-### Install Campaigns
+### Install a Campaign
 
 To install a campaign, first create a definition file, e.g. `From the Ashes.cmp` (the extension is not important). This should contain the desired level names, one per line:
 
@@ -116,13 +122,13 @@ From the Ashes2.szs
 
 The definition file can be safely deleted once the campaign is installed.
 
-#### Example
+**Example**
 
 ```bat
 AnnoTool --anno-dir="C:/Anno 1602" --install-campaign "From the Ashes.cmp"
 ```
 
-#### Sample Output
+**Sample Output**
 
 ```
 Found Anno 1602 installation
